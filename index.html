@@ -10,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./assets/highlight/styles.css" media="all" />
     <link rel="stylesheet" href="./assets/styles.css" media="all" />
+    <link rel="stylesheet" href="./src/focusly.css" />
     <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
   </head>
   <body>
@@ -378,9 +379,21 @@ modal.close();</code></pre>
     </div>
     <!-- /CONTAINER -->
 
+    <template id="modal-1">
+      <h1>Template modal 1</h1>
+    </template>
+
     <script src="./assets/highlight/highlight.js"></script>
+    <script src="./src/focusly.js"></script>
     <script>
+      // Highlight code
       hljs.initHighlightingOnLoad();
+
+      // Modal samples
+      const modal1 = new Focusly({
+        templateId: "modal-1",
+        content: "<h1>Content Modal 1</h1>",
+      });
     </script>
   </body>
 </html>

@@ -1,6 +1,27 @@
 Focusly.elements = [];
 
 function Focusly(options = {}) {
+  if (!options.content && !options.templateId) {
+    console.error("Focusly: content or templateId is required!");
+    return;
+  }
+
+  if (options.content && options.templateId) {
+    options.templateId = null;
+    console.warn(
+      "Focusly: Both content and templateId are provided. Using content and ignoring templateId."
+    );
+  }
+
+  if (options.templateId) {
+    this.template = document.querySelector(`#${options.templateId}`);
+
+    if (!this.template) {
+      console.error(`#${options.templateId} does not exist!`);
+      return;
+    }
+  }
+
   this.opt = Object.assign(
     {
       destroyOnClose: true,
@@ -10,13 +31,8 @@ function Focusly(options = {}) {
     },
     options
   );
-  this.template = document.querySelector(`#${this.opt.templateId}`);
 
-  if (!this.template) {
-    console.error(`#${this.opt.templateId} does not exist!`);
-    return;
-  }
-
+  this.content = this.opt.content;
   const { closeMethods } = this.opt;
   this._allowButtonClose = closeMethods.includes("button");
   this._allowBackdropClose = closeMethods.includes("overlay");
@@ -28,7 +44,13 @@ function Focusly(options = {}) {
 }
 
 Focusly.prototype._build = function () {
-  const content = this.template.content.cloneNode(true);
+  const contentNode = this.content
+    ? document.createElement("div")
+    : this.template.content.cloneNode(true);
+
+  if (this.content) {
+    contentNode.innerHTML = this.content;
+  }
 
   // Create modal elements
   this._backdrop = document.createElement("div");
@@ -50,12 +72,12 @@ Focusly.prototype._build = function () {
     container.append(closeBtn);
   }
 
-  const modalContent = document.createElement("div");
-  modalContent.className = "focusly__content";
+  this._modalContent = document.createElement("div");
+  this._modalContent.className = "focusly__content";
 
   // Append content and elements
-  modalContent.append(content);
-  container.append(modalContent);
+  this._modalContent.append(contentNode);
+  container.append(this._modalContent);
 
   if (this.opt.footer) {
     this._modalFooter = document.createElement("div");
@@ -73,6 +95,14 @@ Focusly.prototype._build = function () {
   this._backdrop.append(container);
   document.body.append(this._backdrop);
 };
+
+Focusly.prototype.setContent = function(content) {
+  this.content = content;
+
+  if (this._modalContent) {
+    this._modalContent.innerHTML = this.content;
+  }
+}
 
 Focusly.prototype.setFooterContent = function (html) {
   this._footerContent = html;
