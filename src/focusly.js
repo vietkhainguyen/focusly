@@ -24,10 +24,12 @@ function Focusly(options = {}) {
 
   this.opt = Object.assign(
     {
+      enableScrollLock: true,
       destroyOnClose: true,
       footer: false,
       cssClass: [],
       closeMethods: ["button", "overlay", "escape"],
+      scrolllockTarget: () => document.body,
     },
     options
   );
@@ -96,13 +98,13 @@ Focusly.prototype._build = function () {
   document.body.append(this._backdrop);
 };
 
-Focusly.prototype.setContent = function(content) {
+Focusly.prototype.setContent = function (content) {
   this.content = content;
 
   if (this._modalContent) {
     this._modalContent.innerHTML = this.content;
   }
-}
+};
 
 Focusly.prototype.setFooterContent = function (html) {
   this._footerContent = html;
@@ -150,8 +152,17 @@ Focusly.prototype.open = function () {
     this._backdrop.classList.add("focusly--show");
   }, 0);
 
-  document.body.classList.add("focusly--no-scroll");
-  document.body.style.paddingRight = this._getScrollbarWidth() + "px";
+  // Disable scrolling
+  if (this.opt.enableScrollLock) {
+    const target = this.opt.scrolllockTarget();
+
+    if (this._hasScrollbar(target)) {
+      target.classList.add("focusly--no-scroll");
+      const targetPadRight = parseInt(getComputedStyle(target).paddingRight);
+      target.style.paddingRight =
+        targetPadRight + this._getScrollbarWidth() + "px";
+    }
+  }
 
   if (this._allowBackdropClose) {
     this._backdrop.onclick = (e) => {
@@ -174,9 +185,11 @@ Focusly.prototype.open = function () {
   return this._backdrop;
 };
 
-Focusly.prototype._handleEscapeKey = function (e) {
-  console.log(this);
+Focusly.prototype._hasScrollbar = (target) => {
+  return target.scrollHeight > target.clientHeight;
+};
 
+Focusly.prototype._handleEscapeKey = function (e) {
   const lastModal = Focusly.elements[Focusly.elements.length - 1];
   if (e.key === "Escape" && this === lastModal) {
     this.close();
@@ -192,7 +205,6 @@ Focusly.prototype._onTransitionEnd = function (callback) {
 
 Focusly.prototype.close = function (destroy = this.opt.destroyOnClose) {
   Focusly.elements.pop();
-  console.log(this);
 
   this._backdrop.classList.remove("focusly--show");
 
@@ -208,8 +220,13 @@ Focusly.prototype.close = function (destroy = this.opt.destroyOnClose) {
     }
 
     // Enable scrolling
-    document.body.classList.remove("focusly--no-scroll");
-    document.body.style.paddingRight = "";
+    if (this.opt.enableScrollLock && !Focusly.elements.length) {
+      const target = this.opt.scrolllockTarget();
+      if (this._hasScrollbar(target)) {
+        target.classList.remove("focusly--no-scroll");
+        target.style.paddingRight = "";
+      }
+    }
 
     if (typeof this.opt.onClose === "function") this.opt.onClose();
   });

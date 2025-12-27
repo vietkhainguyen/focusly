@@ -23,7 +23,7 @@
 .focusly__container {
   position: relative;
   width: min(600px, 90%);
-  padding: 20px 20px 0;
+  padding: 20px;
   border-radius: 10px;
   background: #fff;
   transform: scale(0);
@@ -39,10 +39,13 @@
   border-radius: 50%;
   background: #ebebeb;
   font-size: 2rem;
+  border: none;
+  outline: none;
 }
 
 .focusly__close:hover {
   color: #333;
+  cursor: pointer;
 }
 
 .focusly__content {
@@ -54,7 +57,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  padding: 20px 0;
+  padding-top: 20px;
 }
 
 .focusly--no-scroll {
