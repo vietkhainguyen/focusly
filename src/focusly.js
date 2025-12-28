@@ -153,7 +153,7 @@ Focusly.prototype.open = function () {
   }, 0);
 
   // Disable scrolling
-  if (this.opt.enableScrollLock) {
+  if (Focusly.elements.length === 1 && this.opt.enableScrollLock) {
     const target = this.opt.scrolllockTarget();
 
     if (this._hasScrollbar(target)) {
